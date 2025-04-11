@@ -1,7 +1,6 @@
 ## Introduction
 When working with Kubernetes, applications scale and shift fast, one fundamental challenge stands out which is persistent storage. The question is how to ensure that the critical data does not get lost due to the ephemeral nature of containers? The traditional storage solutions require complex configurations, performance issues, and in general it is a big problem for DevOps teams.
 
-
 Applications that need stateful data also need a storage system that is highly available, scalable, and easy to manage.
 
 ## Why Longhorn
@@ -35,8 +34,7 @@ Following are the main tasks of the Longhorn manager:
 - **Health Monitoring and Failover Handling** - The Longhorn Manager monitors the health of the Longhorn system. It detects and responds to node failures and other issues. It also works to ensure that the actual state of the Longhorn system matches the desired state defined by the user.
 - **Kubernetes Integration** - The Longhorn Manager uses Kubernetes Custom Resource Definitions (CRDs) to interact with Kubernetes and manage storage natively within clusters.
 
-> Note: Each node in the Kubernetes cluster runs an instance of Longhorn Manager, which communicates with other managers to maintain a distributed storage control plane.
-
+> **Note**: Each node in the Kubernetes cluster runs an instance of Longhorn Manager, which communicates with other managers to maintain a distributed storage control plane.
 
 ### Longhorn UI
 The Longhorn UI provides a web-based interface used by administrators for managing and monitoring Longhorn volumes .
@@ -48,7 +46,7 @@ Following are the main features of Longhorn UI:
 - It provides alerts and notifications for critical events.
 - It also offers tools for troubleshooting and failure recovery through logs and system events.
 
-> Note: Longhorn can be fully managed via `kubectl` and APIs, the UI provides an intuitive alternative for non-CLI users.
+> **Note**: Longhorn can be fully managed via `kubectl` and APIs, the UI provides an intuitive alternative for non-CLI users.
 
 
 ### Longhorn CSI Driver
@@ -150,7 +148,7 @@ hin provisioning helps to efficiently use storage resources as only the actual u
 ### Data Locality
 Longhorn attempts to place replicas on nodes that are close to the application pods that are using the volume. This helps to minimize the network latency and improves performance. For example: If a volume’s primary workload runs on Node A, Longhorn ensures at least one replica exists on the same node. It helps to reduce network latency since data does not need to travel between nodes. Now, if the workload moves to Node B, Longhorn dynamically adjusts replica placement to optimize locality.
 
-> Note: Longhorn follows node affinity rules when scheduling volumes and replicas. Longhorn will also attempt to keep replicas on different storage disks, to minimize the impact of disk failure.
+> **Note**: Longhorn follows node affinity rules when scheduling volumes and replicas. Longhorn will also attempt to keep replicas on different storage disks, to minimize the impact of disk failure.
 
 ### Volume Scheduling
 Longhorn dynamically schedules volumes and their replicas based on factors like:
@@ -218,6 +216,3 @@ Longhorn can be [installed](https://longhorn.io/docs/1.8.1/deploy/install/) on a
 - Use dedicated storage devices for Longhorn volumes to improve performance.
 - Ensure that the nodes that longhorn runs on have sufficient resources.
 - Ensure that the network between the nodes is stable and fast.
-
-
-
