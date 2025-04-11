@@ -23,7 +23,7 @@ Longhorn Engine is the data plane component responsible for handling all I/O ope
 #### Data Replication and Recovery
 By default, each Longhorn volume is configured with two replicas. The Longhorn Engine synchronously replicates all write operations across these replicas to ensure data redundancy and fault tolerance. If a replica fails, the engine automatically rebuilds it using an existing healthy replica. This helps in maintaining data integrity without manual intervention.
 
-#### Handling Input/Output Requests
+#### Handling Input-Output Requests
 The Longhorn Engine lies between the application and the storage system. It receives block-level read and write requests via the Container Storage Interface (CSI) driver and efficiently processes them.
 
 #### Snapshot and Backup Handling
@@ -47,7 +47,7 @@ The Longhorn Manager is the control plane component that orchestrates and manage
 
 ### Responsibilities of Longhorn Manager
 #### Volume Scheduling and Lifecycle Management
-Longhorn Manager determines the accurate placement of volumes and replicas across the Kubernetes cluster by considering factors like node availability, storage capacity, and data locality. It is responsible for the creation, expansion, migration, deletion and maintenance of Longhorn volumes.
+Longhorn Manager determines the accurate placement of volumes and replicas across the Kubernetes cluster by considering factors like node availability, storage capacity, and data locality. It handles the creation, expansion, migration, deletion and maintenance of Longhorn volumes.
 
 #### Scheduling and Replica Coordination
 The Longhorn Manager ensures that the replicas are distributed across the available nodes.
@@ -181,7 +181,7 @@ Longhorn attempts to place replicas on nodes that are close to the application p
 #### Example
 If a volume’s primary workload runs on **Node A**, Longhorn ensures at least one replica exists on the same node. It helps to reduce **network latency** since data does not need to travel between nodes. Now, if the workload moves to **Node B**, Longhorn dynamically adjusts replica placement to optimize locality.
 
-> **Note**: Longhorn follows node affinity rules when scheduling volumes and replicas. Longhorn will also attempt to keep replicas on different storage disks, to minimize the impact of disk failure.
+> **Note**: Longhorn follows node affinity rules when scheduling volumes and replicas. Longhorn also attempt to keep replicas on different storage disks, to minimize the impact of disk failure.
 
 
 ### Volume Scheduling
@@ -204,7 +204,7 @@ Longhorn utilizes Kubernetes node affinity rules to ensure that replicas are pla
 
 
 ## Integration and Interactions between Longhorn and Kubernetes
-Longhorn is designed around tight integration with Kubernetes which enables it to act as a native storage solution within the container orchestration ecosystem.
+Longhorn is designed around tight integration with Kubernetes which enables it to act as a built-in storage solution within the container orchestration ecosystem.
 
 ### How Longhorn integrates with Kubernetes’ storage classes, volumes, PVCs and CSI
 Longhorn utilizes Kubernetes StorageClasses to define different storage provisioning policies such as replication count, snapshot frequency, and backup configurations. Users can create PVCs referencing these StorageClasses, and Longhorn would dynamically provision the required Persistent Volumes (PVs). This enables on-demand storage provisioning based on application requirements. The CSI driver acts as the bridge, translating Kubernetes storage requests into Longhorn API calls. This allows pods to mount Longhorn volumes just like any other Kubernetes-supported storage back-end.
@@ -223,7 +223,7 @@ Longhorn is a **CNCF** project developed by **Rancher** which makes it the defau
 
 
 ## Setting Up and Using Longhorn
-Longhorn can be installed using Helm, kubectl or the Rancher UI.
+Longhorn can be installed using Helm, `kubectl` or the Rancher UI.
 
 ### Installation Process - Helm Chart
 Helm is the recommended method for installing Longhorn. It simplifies the deployment and management of Longhorn components. Longhorn Helm repository can be added and installed with a few simple commands.
