@@ -1,18 +1,18 @@
 ## Introduction
-When working with Kubernetes, applications scale and shift fast, one fundamental challenge that stands is persistent storage. The question is how to ensure critical data does not get lost due to the ephemeral nature of containers? The traditional storage solutions require complex configurations, performance issues, and in general it is a big problem for DevOps teams.
+When working with Kubernetes, applications scale and shift fast, one fundamental challenge that stands is persistent storage. The question is how to ensure critical data does not get lost due to the ephemeral nature of containers? The traditional storage solutions require complex configurations, performance issues, and it is a big problem for DevOps teams.
 
-Applications that need stateful data also need a storage system that is highly available, scalable, and easy to manage.
+Applications that need stateful data also need a storage system that is highly available, scalable and easy to manage.
 
 ## Why Longhorn
-Kubernetes provides scalability and flexibility which helps in easy deployment of containerized applications. But Kubernetes is designed to handle ephemeral workloads, meaning that if a container dies, its local storage disappears with it. However, stateful applications such as databases, message queues, and logging systems require storage that is persistent in nature. Utilizing traditional storage solutions in this dynamic environment introduces significant challenges: setting up and managing storage often requires complex manual configurations of storage classes, volumes, and replication strategies, and these solutions are generally not optimized for distributed systems, potentially leading to increased latency and reduced performance.
+Kubernetes provides scalability and flexibility which helps in easy deployment of containerized applications. But Kubernetes is designed to handle ephemeral workloads, meaning that if a container dies, its local storage disappears with it. However, stateful applications such as databases, message queues, and logging systems require storage that is persistent in nature. Traditional storage solutions require complex manual setup for storage classes, volumes and replication, and are often not optimized for distributed systems. This can potentially lead to increased latency and reduced performance.
 
-To address these persistent storage challenges, [Longhorn](https://longhorn.io/) emerges as a specifically designed solution for Kubernetes. It is a cloud-native, lightweight, and distributed block storage system offering flexibility and resilience comparable to the containerized applications it supports. Addressing the limitations of traditional approaches, Longhorn leverages Kubernetes' distributed architecture to provide high availability and fault tolerance through synchronous data replication across multiple nodes, ensuring data integrity even if nodes fail while being optimized for performance in a distributed environment.
+To address these persistent storage challenges, [Longhorn](https://longhorn.io/) emerges as a specifically designed solution for Kubernetes. It is a cloud native, lightweight and distributed block storage system offering flexibility and resilience comparable to the containerized applications it supports. Longhorn uses Kubernetes' distributed architecture for high availability and fault tolerance, using synchronous data replication across multiple nodes. It ensures data integrity even if nodes fail while being optimized for performance in a distributed environment.
 
-Furthermore, Longhorn integrates seamlessly and works natively with core Kubernetes storage concepts like Storage Classes, Persistent Volumes (PVs), and Persistent Volume Claims (PVCs). This significantly simplifies storage management compared to manual configurations, allowing users to efficiently provision, expand, and manage volumes using familiar Kubernetes-native APIs. Overall, Longhorn offers simplicity, reliability, automated snapshotting and backup capabilities, and self-healing features, making it a scalable and easy-to-use solution for running stateful applications on Kubernetes.
+Furthermore, Longhorn integrates seamlessly and works natively with core Kubernetes storage concepts like Storage Classes, Persistent Volumes (PVs), and Persistent Volume Claims (PVCs). This simplifies storage management compared to manual configurations, allowing users to efficiently provision, expand and manage volumes using familiar Kubernetes built-in APIs. Overall, Longhorn offers simplicity, reliability, automated snapshotting and backup, and self-healing, making it a scalable and simple solution for running stateful applications on Kubernetes.
 
 ## Longhorn Architecture
 Longhorn's' architecture is divided into distinct control and data planes to manage storage resources effectively.
-- The **Control Plane**, orchestrated by the Longhorn Manager, is responsible for overall system management. This includes volume creation, scheduling replicas across cluster nodes, monitoring component health, and integrating with the Kubernetes API.
+- The **Control Plane**, orchestrated by the Longhorn Manager, manages overall system management. This includes volume creation, scheduling replicas across cluster nodes, monitoring component health, and integrating with the Kubernetes API.
 - The **Data Plane** handles all the input output operations. It involves the Longhorn Engine (a dedicated controller for each volume), Longhorn Replicas (which maintain redundant copies of volume data on different nodes for high availability), and the Longhorn CSI Driver (which enables seamless communication between Kubernetes pods and Longhorn volumes).
 
 Additionally, an optional Longhorn UI offers a graphical interface for monitoring and managing the storage system. This component-based architecture ensures resilience and simplifies storage operations within a Kubernetes environment.
@@ -91,7 +91,7 @@ This describes how application data is read from and written to Longhorn volumes
    - For writes, it synchronously replicates the data across all active, healthy **Replicas** (each typically residing on a different node and storing the data on its physical disk).
    - For reads, it retrieves data from a suitable healthy replica and returns it via the CSI driver back to the application.
 
-This flow essentially follows:
+This flow follows:
 ```
 Pod -> Kubelet -> CSI Driver -> Longhorn Engine -> Replicas -> Physical Storage
 ```
@@ -99,16 +99,16 @@ Pod -> Kubelet -> CSI Driver -> Longhorn Engine -> Replicas -> Physical Storage
 #### Control Path
 This involves the management and orchestration of the Longhorn system.
 1. The **Longhorn Manager** communicates with the **Kubernetes API server**, using Custom Resource Definitions (CRDs) to define and observe the state of volumes and other Longhorn resources.
-2. It also communicates directly with the **Longhorn Engines** to issue commands for actions like snapshot creation, replica rebuilding, and volume attachment/detachment.
+2. It also communicates directly with the **Longhorn Engines** to issue commands for actions like snapshot creation, replica rebuilding, and volume attachment or detachment.
 3. This ensures the cluster's actual storage state aligns with the user's desired configuration and maintains high availability.
 
 
 ### Longhorn Engine
-Longhorn Engine is the data plane component responsible for handling all I/O operations for a specific volume. It runs as a Linux process and operates on a per-volume basis which means each Longhorn volume has its own dedicated engine (controller). Longhorn Engine is one of the most important components which provides data consistency, availability, and resilience through synchronous replication and fault recovery mechanisms.
+Longhorn Engine is the data plane component responsible for handling all I/O operations for a specific volume. It runs as a Linux process and operates on a per-volume basis which means each Longhorn volume has its own dedicated engine (controller). Longhorn Engine is one of the most important components which provides data consistency, availability and resilience through synchronous replication and fault recovery mechanisms.
 
 The following are the main tasks that the Longhorn engine manages:
 - **Data Replication and Recovery** - By default, each Longhorn volume is configured with two replicas. The Longhorn Engine synchronously replicates all write operations across these replicas to ensure data redundancy and fault tolerance. If a replica fails, the engine automatically rebuilds it using an existing healthy replica. This helps maintain data integrity without manual intervention.
-- **Handling Input/Output Requests** - The Longhorn Engine lies between the application and the storage system. It receives block-level read and write requests via the Container Storage Interface (CSI) driver and efficiently processes them.
+- **Handling Input and Output Requests** - The Longhorn Engine lies between the application and the storage system. It receives block-level read and write requests via the Container Storage Interface (CSI) driver and efficiently processes them.
 - **Snapshot and Backup Handling** - Longhorn supports snapshot creation and incremental backups.
 - **Volume Management** - The Longhorn Engine enables dynamic volume provisioning, resizing, and deletion. These features simplify storage operations within Kubernetes environments.
 - **Replica Management** - The Longhorn Engine continuously checks the health of replicas and initiates automatic repairs or resynchronization in case of failures and inconsistencies.
@@ -120,7 +120,7 @@ The following are the main tasks that the Longhorn engine manages:
 The Longhorn Manager is the control plane component that orchestrates and manages the Longhorn system. It operates as a Kubernetes daemon set and interacts with the Kubernetes API server. It runs as a Kubernetes controller, manages storage requests, maintains volume metadata, and it also ensures the proper scheduling of Longhorn operations.
 
 The following are the main tasks of the Longhorn manager:
-- **Volume Scheduling and Lifecycle Management** - The Longhorn Manager determines the accurate placement of volumes and replicas across the Kubernetes cluster by considering factors like node availability, storage capacity, and data locality. It is responsible for the creation, expansion, migration, deletion, and maintenance of Longhorn volumes.
+- **Volume Scheduling and Lifecycle Management** - The Longhorn Manager determines the accurate placement of volumes and replicas across the Kubernetes cluster by considering factors like node availability, storage capacity, and data locality. It manages the creation, expansion, migration, deletion, and maintenance of Longhorn volumes.
 - **Scheduling and Replica Coordination** - The Longhorn Manager ensures that the replicas are distributed across the available nodes.
 - **Snapshot and Backup Coordination** - The Longhorn Manager coordinates snapshot and backup operations to ensure data consistency and integrity.
 - **Health Monitoring and Failover Handling** - The Longhorn Manager monitors the health of the Longhorn system. It detects and responds to node failures and other issues. It also works to ensure that the actual state of the Longhorn system matches the desired state defined by the user.
@@ -141,10 +141,8 @@ The following are the main features of Longhorn UI:
 > **Note**: Longhorn can be fully managed via `kubectl` and APIs, the UI provides an intuitive alternative for non-CLI users.
 
 
-### Longhorn CSI Driver
-The Container Storage Interface (CSI) Driver is the component that allows Kubernetes workloads to interact with Longhorn as a persistent storage provider using the standard CSI interface.
-
-The CSI driver enables Kubernetes applications to use Longhorn storage as if they were interacting with any other cloud-native storage provider, making it fully compatible with Kubernetes storage operations.
+### Longhorn Container Storage Interface (CSI) Driver
+The CSI Driver is the component that allows Kubernetes workloads to interact with Longhorn as a persistent storage provider using the standard CSI interface. The CSI driver allows Kubernetes applications to use Longhorn storage seamlessly and ensures full compatibility with Kubernetes storage operations.
 
 Following are the main responsibilities of the Longhorn CSI Driver:
 - It enables Kubernetes to automatically create and attach Longhorn volumes when needed.
@@ -182,9 +180,9 @@ Longhorn uses thin provisioning, meaning storage space is allocated on demand. I
 hin provisioning helps to efficiently use storage resources as only the actual used space is allocated. This is especially helpful in environments where storage usage fluctuates.
 
 ### Data Locality
-Longhorn attempts to place replicas on nodes that are close to the application pods that are using the volume. This helps minimize network latency and improves performance. For example: If a volume’s primary workload runs on Node A, Longhorn ensures at least one replica exists on the same node. It helps reduce network latency since data does not need to travel between nodes. Now, if the workload moves to Node B, Longhorn dynamically adjusts replica placement to optimize locality.
+Longhorn attempts to place replicas on nodes that are close to the application pods that are using the volume. This helps minimize network latency and improves performance. For example: if a volume’s primary workload runs on Node A, Longhorn ensures at least one replica exists on the same node. It helps reduce network latency since data does not need to travel between nodes. Now, if the workload moves to Node B, Longhorn dynamically adjusts replica placement to optimize locality.
 
-> **Note**: Longhorn follows node affinity rules when scheduling volumes and replicas. Longhorn will also attempt to keep replicas on different storage disks, to minimize the impact of disk failure.
+> **Note**: Longhorn follows node affinity rules when scheduling volumes and replicas. Longhorn also attempt to keep replicas on different storage disks, to minimize the impact of disk failure.
 
 ### Volume Scheduling
 Longhorn dynamically schedules volumes and their replicas based on factors like:
@@ -205,10 +203,10 @@ Longhorn utilizes Kubernetes node affinity rules to ensure that replicas are pla
 - **Anti-Affinity**: Prevent volumes from being placed on the same node to improve fault tolerance.
 
 ## Integration and Interactions between Longhorn and Kubernetes
-Longhorn is designed around tight integration with Kubernetes which enables it to act as a native storage solution within the container orchestration ecosystem.
+Longhorn is designed around tight integration with Kubernetes which enables it to act as a built-in storage solution within the container orchestration ecosystem.
 
 ### How Longhorn integrates with Kubernetes’ storage classes, volumes, PVCs and CSI
-Longhorn utilizes Kubernetes StorageClasses to define different storage provisioning policies such as replication count, snapshot frequency, and backup configurations. Users can create PVCs referencing these StorageClasses, and Longhorn will dynamically provision the required Persistent Volumes (PVs). This enables on-demand storage provisioning based on application requirements. The CSI driver acts as the bridge, translating Kubernetes storage requests into Longhorn API calls. This allows pods to mount Longhorn volumes just like any other Kubernetes-supported storage backend.
+Longhorn utilizes Kubernetes StorageClasses to define different storage provisioning policies such as replication count, snapshot frequency, and backup configurations. Users can create PVCs referencing these StorageClasses, and Longhorn dynamically provision the required Persistent Volumes (PVs). This enables on-demand storage provisioning based on application requirements. The CSI driver acts as the bridge, translating Kubernetes storage requests into Longhorn API calls. This allows pods to mount Longhorn volumes just like any other Kubernetes-supported storage back-end.
 
 Longhorn is fully compliant with the Container Storage Interface (CSI) standards.
 
@@ -224,16 +222,16 @@ Longhorn is a CNCF project developed by Rancher which makes it the default stora
 
 
 ## Installing Longhorn
-Longhorn can be installed using Helm, kubectl, or the Rancher UI. Ensure that Kubernetes cluster meets the minimum requirements for Longhorn. Click [Installation Requirements](https://longhorn.io/docs/1.8.1/deploy/install/#installation-requirements) for more details.
+Longhorn can be installed using Helm, `kubectl` or the Rancher UI. Ensure that Kubernetes cluster meets the minimum requirements for Longhorn. Click [Installation Requirements](https://longhorn.io/docs/1.8.1/deploy/install/#installation-requirements) for more details.
 
 ### Installation using Helm Chart
 Helm is the recommended method for installing Longhorn. It simplifies the deployment and management of Longhorn components. Longhorn Helm repository can be added and installed with a few simple commands.
 
 For detailed installation steps, click [Install with Helm](https://longhorn.io/docs/1.8.1/deploy/install/install-with-helm/).
 
-### Installation using kubectl
-Longhorn can also be installed using kubectl by applying the provided YAML manifests. This method is more manual but provides greater control over the installation process. This is useful for environments without Helm.
-For detailed installation steps, click [Install with Kubectl](https://longhorn.io/docs/1.8.1/deploy/install/install-with-kubectl/).
+### Installation using `kubectl`
+Longhorn can also be installed using `kubectl` by applying the provided YAML manifests. This method is more manual but provides greater control over the installation process. This is useful for environments without Helm.
+For detailed installation steps, click [Install with `kubectl`](https://longhorn.io/docs/1.8.1/deploy/install/install-with-kubectl/).
 
 ### Installation using Rancher UI
 Longhorn can be easily installed through the Rancher UI. This is the simplest way to install Longhorn if Rancher is already deployed.
@@ -250,6 +248,6 @@ Longhorn can be [installed](https://longhorn.io/docs/1.8.1/deploy/install/) on a
 - **Use Multiple Replicas**: Set up Longhorn volumes to have multiple copies (replicas) on different physical servers (nodes). Three replicas is common for production. This prevents data loss if one server fails.
 - **Use Dedicated, Fast Disks**: Store Longhorn data on separate, fast disks (SSDs or NVMe are best). Crucially, do NOT use the main operating system disk for Longhorn storage, as this can cause instability.
 - **Ensure Sufficient Node Resources**: Make sure the servers (nodes) running Longhorn have enough CPU power, memory (RAM), and a fast, reliable network connection between them.
-- **BACK UP YOUR DATA**: This is vital! Set up automatic, regular backups of your Longhorn volumes to a separate storage location (like NFS or an S3 bucket). Don't rely only on replicas.
-- **Monitor Health and Space**: Regularly check the Longhorn UI or other monitoring tools to ensure the system is healthy, performing well, and that your storage disks aren't getting full.
-- **Prevent Accidental Data Loss**: When setting up storage types (StorageClasses) in Kubernetes, use the reclaimPolicy: Retain setting. This helps prevent data from being deleted automatically if you accidentally remove the volume claim in Kubernetes.
+- **BACK UP YOUR DATA**: This is important. Set up automatic, regular backups of your Longhorn volumes to a separate storage location (like NFS or an S3 bucket). Do not rely only on replicas.
+- **Monitor Health and Space**: Regularly check the Longhorn UI or other monitoring tools to ensure the system is healthy, performing well, and that your storage disks are not getting full.
+- **Prevent Accidental Data Loss**: When setting up storage types (StorageClasses) in Kubernetes, use the `reclaimPolicy: Retain` setting. This helps prevent data from being deleted automatically if you accidentally remove the volume claim in Kubernetes.
